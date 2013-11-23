@@ -1,0 +1,23 @@
+.letters {
+	width: 35px;
+	margin-bottom:5px;
+	margin-right:4px;
+	text-transform: uppercase;
+	&:nth-child(7n) {
+		margin-right:0px
+	}
+}
+
+#word-wrapper {
+	font-size: 70px;
+	text-align:center;
+	.underline {
+		display:inline-block;
+		border-bottom: 3px solid black;
+		min-width:40px;
+	}
+	.hide-letter {
+		display: none;
+		min-height:60px;
+	}
+}
