@@ -22,28 +22,39 @@ StmpyMe.HangmanController = Ember.Controller.extend({
 	},
 	alphabet: [],
 	word: [],
-	guesses: {
-		attempts: 0,
-		left: function() {
-			console.log(this.guesses.attempts);
-			return 10 - this.guesses.attempts;
-		}.property('guesses.attempts'),
-		class: function() {
-			if(this.get('guesses.left') <= 2) {
-				return 'label-danger';
-			} else if(this.get('guesses.left') <= 5) {
-				return 'label-warning';
-			}
-			return 'label-success';
-		}.property('guesses.left')
+	attempts: 0,
+	message: null,
+	messageType: 'alert-success',
+	guessesLeft: function() {
+		return 10 - this.attempts;
+	}.property('attempts'),
+	guessesClass: function() {
+		if(this.get('guessesLeft') <= 2) {
+			return 'label-danger';
+		} else if(this.get('guessesLeft') <= 5) {
+			return 'label-warning';
+		}
+		return 'label-success';
+	}.property('guessesLeft'),
+	_disableAlphabet: function() {
+		// disable all the alphabet
+		this.alphabet.forEach(function(item,index){
+			Ember.set(item,'isClicked',true);
+		});
+	},
+	_youLose: function() {
+		this._disableAlphabet();
+		this.set('message','Sorry you have lost!');
+		this.set('messageType','alert-danger');
+	},
+	_youWin: function() {
+		this._disableAlphabet();
+		this.set('message','You have won!!!!! Yay! and the peasants rejoice');
 	},
 	actions: {
 		checkLetter: function(value) {
 			// disable after it has been clicked
 			Ember.set(this.alphabet.findBy('value',value),'isClicked',true);
-
-			// update attempts
-			this.set('attempts',parseInt(this.guesses.attempts+1));
 
 			// check the word to see if any letters were found
 			var letters = this.word.filterBy('value',value);
@@ -51,6 +62,23 @@ StmpyMe.HangmanController = Ember.Controller.extend({
 				letters.forEach(function(item,index){
 					Ember.set(item,'isFound',true);
 				});
+			} else {
+				// update attempts
+				this.incrementProperty('attempts',1);
+			}
+			// check if they have won
+			var haveWon = true;
+			this.word.forEach(function(item,index){
+				if(!item.isFound) {
+					haveWon = false;
+				}
+			});
+			if(haveWon) {
+				this._youWin();
+			}
+			// check if they have lost
+			if(this.get('guessesLeft') == 0) {
+				this._youLose();
 			}
 		}
 	}
