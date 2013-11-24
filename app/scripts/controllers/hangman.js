@@ -1,32 +1,56 @@
+var alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+var word = "pumpkins".split("");
 StmpyMe.HangmanController = Ember.Controller.extend({
 	init: function(){
-		console.log('now I am running ');
+		// set up alphabet
+		for(i=0; i<alphabet.length; i++) {
+			this.alphabet.push({
+				id: i,
+				value: alphabet[i],
+				isClicked: false
+			});
+		}
+		// set up word
+		for(i=0; i<word.length; i++) {
+			this.word.push({
+				id: i,
+				value: word[i],
+				isFound: false
+			});
+		}
 		this._super();
 	},
-	allLetters: ("abcdefghijklmnopqrstuvwxyz").split(""),
-	word: "pumpkins".split(""),
-	attempts: 0,
-	guessesLeft: function() {
-		return 10 - this.attempts;
-	}.property('attempts'),
-	actions: {
-		checkLetter: function(letter) {
-			// disable after it has been clicked
-			$('#'+letter).attr('disabled',true);
-			// update attempts
-			this.set('attempts',parseInt(this.attempts+1));
-			console.log(this.get('guessesLeft'));
-			switch(this.get('guessesLeft')) {
-				case 5:
-					$('#guesses').removeClass('label-success').addClass('label-warning');
-					break;
-				case 2:
-					$('#guesses').removeClass('label-warning').addClass('label-danger');
-					break;
+	alphabet: [],
+	word: [],
+	guesses: {
+		attempts: 0,
+		left: function() {
+			console.log(this.guesses.attempts);
+			return 10 - this.guesses.attempts;
+		}.property('guesses.attempts'),
+		class: function() {
+			if(this.get('guesses.left') <= 2) {
+				return 'label-danger';
+			} else if(this.get('guesses.left') <= 5) {
+				return 'label-warning';
 			}
+			return 'label-success';
+		}.property('guesses.left')
+	},
+	actions: {
+		checkLetter: function(value) {
+			// disable after it has been clicked
+			Ember.set(this.alphabet.findBy('value',value),'isClicked',true);
 
-			if(this.word.indexOf(letter) != -1) {
-				$('span[data\-letter="'+letter+'"]').removeClass('hide-letter');
+			// update attempts
+			this.set('attempts',parseInt(this.guesses.attempts+1));
+
+			// check the word to see if any letters were found
+			var letters = this.word.filterBy('value',value);
+			if(letters.length > 0) {
+				letters.forEach(function(item,index){
+					Ember.set(item,'isFound',true);
+				});
 			}
 		}
 	}

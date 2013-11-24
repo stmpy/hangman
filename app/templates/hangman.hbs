@@ -1,19 +1,21 @@
 <div class="row">
 	<div class="col-sm-4">
-		{{#each letter in allLetters}}
-			<button {{action 'checkLetter' letter }} {{bindAttr id="letter"}} class="btn btn-primary letters" >{{letter}}</button>
+		{{#each letter in alphabet}}
+			<button {{action 'checkLetter' letter.value}} {{bind-attr id="letter.id"}} class="btn btn-primary letters" {{bind-attr disabled=letter.isClicked}}>{{letter.value}}</button>
 		{{/each}}
 		<div class="row">
 			<div class="col-sm-12" style="text-align:center;">
-				<span id="guesses" class="label label-success">Guesses Left <strong>{{guessesLeft}}</strong></span>
+				{{#with guesses}}
+				<span id="guesses" {{bind-attr class=":label class"}}>Guesses Left <strong>{{left}}</strong></span>
+				{{/with}}
 			</div>
 		</div>
 	</div>
 	<div class="col-sm-8">
 		<div id="word-wrapper">
-			{{#each l in word}}
+			{{#each letter in word}}
 				<div class="underline">
-					<span {{bindAttr data-letter="l"}} class="hide-letter">{{l}}</span>
+					<span {{bind-attr class="letter.isFound::hide-letter"}}>{{letter.value}}</span>
 				</div>
 			{{/each}}
 		</div>
